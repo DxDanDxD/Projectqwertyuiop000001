@@ -26,4 +26,3 @@ async def start_handler(message: types.Message):
 
 
 executor.start_polling(dp, skip_updates=True)
-
