@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher, executor, types
 
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
 
 bot = Bot(TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -29,8 +30,6 @@ async def name_handler(message: types.Message, state: FSMContext):
 @dp.message_handler(state="name")
 async def name_handler(message: types.Message, state: FSMContext):
     name = message.text
-    if name=='Julia' or name=='Юля' or name=='Юлия':
-        await message.answer("Привет от Дани!")
     await state.update_data({"name": name})
     await message.answer(f"{name}, добро пожаловать в эхо бота!")
     await message.answer("Сколько тебе лет?")
