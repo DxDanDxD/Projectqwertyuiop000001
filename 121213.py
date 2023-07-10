@@ -16,7 +16,7 @@ class Player:
     status: bool
     def setstatus(self, newstatus:bool):
         self.status=newstatus
-    
+
 
 
 active_users: set[int] = set()
@@ -35,22 +35,17 @@ async def name_handler(message: types.Message, state: FSMContext):
     await state.update_data({"name": name})
     await message.answer(f"{name}, добро пожаловать в эхо бота!")
     await message.answer("Сколько тебе лет?")
-    await state.set_state("peoplequantityselect")
+    await state.set_state("st1")
 
 
-@dp.message_handler(state="peoplequantityselect")
+@dp.message_handler(state="st1")
 async def name_handler(message: types.Message, state: FSMContext):
     await state.update_data({"age": age})
-    await state.set_state("echo")
+    await state.set_state("st")
 
 
-@dp.message_handler(commands=['help'], state='*')
-async def start_handler(message: types.Message):
-    await message.answer("Этот бот повторяет за вами всё, что вы говорите. Чтобы начать пользоваться ботом, напишите /start.")
-
-
-@dp.message_handler(state="echo")
-async def echo_nadler(message: types.Message):
+@dp.message_handler(state="st2")
+async def echo_handler(message: types.Message):
     for id in active_users:
        await bot.send_message(chat_id = id , text=message.text)
 
