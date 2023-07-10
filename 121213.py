@@ -5,8 +5,18 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
 
+
 bot = Bot(TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
+
+
+class Player:
+    pnumber: int
+    role: str
+    status: bool
+    def setstatus(self, newstatus:bool):
+        self.status=newstatus
+    
 
 
 active_users: set[int] = set()
@@ -19,27 +29,20 @@ async def start_handler(message: types.Message, state: FSMContext):
     await state.set_state("name")
 
 
-@dp.message_handler(state="age")
-async def name_handler(message: types.Message, state: FSMContext):
-    age = message.text
-    await state.update_data({"age": age})
-    await message.answer("Принято.")
-    await state.set_state("echo")
-
-
 @dp.message_handler(state="name")
 async def name_handler(message: types.Message, state: FSMContext):
     name = message.text
     await state.update_data({"name": name})
     await message.answer(f"{name}, добро пожаловать в эхо бота!")
     await message.answer("Сколько тебе лет?")
-    await state.set_state("age")
+    await state.set_state("peoplequantityselect")
 
 
-"""@dp.message_handler(state="echo")
-async def echo_nadler(message: types.Message, state: FSMContext):
-    user_data = await state.get_data()
-    await message.answer(f'{user_data["name"]} сказал: {message.text}')"""
+@dp.message_handler(state="peoplequantityselect")
+async def name_handler(message: types.Message, state: FSMContext):
+    await state.update_data({"age": age})
+    await state.set_state("echo")
+
 
 @dp.message_handler(commands=['help'], state='*')
 async def start_handler(message: types.Message):
