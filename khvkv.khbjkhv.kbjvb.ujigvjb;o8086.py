@@ -43,8 +43,6 @@ async def select_players(message: types.Message,state: FSMContext):
     await state.set_state('s2')
 
 
-
-
 executor.start_polling(dp, skip_updates=True)
 if __name__ == '__main__':
     from aiogram import executor
