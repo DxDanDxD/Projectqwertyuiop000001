@@ -9,8 +9,7 @@ bot = Bot(token=TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-
-
+number=0
 
 
 @dp.message_handler(commands=['start'],state='*')
@@ -18,19 +17,8 @@ async def start_game(message: types.Message, state: FSMContext):
     await message.answer('Welcome to the game of "COWS AND BULLS"!')
     await message.answer('The game has started. Guess now!')
     await message.answer('Type your guess:')
-    #await message.answer(number)
-    await state.set_state('2')
 
-
-
-
-@dp.message_handler(state='2')
-async def process_guess(message: types.Message, state: FSMContext):
-
-    attempts = 0
-    score = 0
-
-    number: int
+    global number
     x1 = randint(0, 9)
     x10 = randint(0, 9)
     x100 = randint(0, 9)
@@ -41,13 +29,29 @@ async def process_guess(message: types.Message, state: FSMContext):
         x100 = randint(0, 9)
     if x1000 == x1 or x10 == x100 or x10 == x10:
         x1000 = randint(1, 9)
-    number = x1 + x10 * 10 + x100 * 100 + x1000 * 1000
+    number =number +  x1 + x10 * 10 + x100 * 100 + x1000 * 1000
+
+    #await message.answer(number)
+    await state.set_state(2)
+
+
+@dp.message_handler(state='2')
+async def process_guess(message: types.Message, state: FSMContext):
+
+    attempts = 0
+    score = 0
+
+
+    await state.update_data(number=number)
+    data = await state.get_data()
+    number = data['number']
 
     if message.text.isdigit():
         guess = int(message.text)
+
         if guess == 2903:
             await message.answer(number)
-            await state.set_state('2')
+
         ones = guess % 10
         decs = ((guess - guess % 10) / 10) % 10
         cents = ((guess - guess % 100) / 100) % 10
