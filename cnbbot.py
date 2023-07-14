@@ -1,4 +1,6 @@
 from config import TOKEN
+import time
+import random
 from random import randint
 from aiogram import Bot, Dispatcher, types, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -10,12 +12,35 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 number: int
+ecount = 0
 
+@dp.message_handler(commands=['help'], state='*')
+async def helper(message: types.Message, state: FSMContext):
+    await message.answer('"COWS AND BULLS" is a game of guessing.'
+                         'The system creates number which consists of non-repeating digits.')
+    time.sleep(0.5)
+    await message.answer(' Your goal is to guess this number.'
+                         'If your guess includes digit that is present in the system`s number and is not located on the place you placed it, then it`s called "COW"')
+    time.sleep(0.5)
+    await message.answer('If your guess includes digit that is present in the system`s number and is indeed located on the place you put it on, then it`s called "BULL"')
+
+    time.sleep(0.5)
+    await message.answer('Please, don`t waste your time tryna break the bot by entering text, that will work not.')
+
+    if state==(2):
+        time.sleep(0.5)
+        await message.answer('Now that you know the rules, stick to guessing.')
+    else:
+        time.sleep(0.5)
+        await message.answer('Shall we /start ?')
+    await state.set_state('2')
 
 @dp.message_handler(commands=['start'],state='*')
 async def start_game(message: types.Message, state: FSMContext):
     await message.answer('Welcome to the game "COWS AND BULLS"!')
-    await message.answer('The game has started. Guess now!')
+    time.sleep(0.5)
+    await message.answer('The game has begun.')
+    time.sleep(0.5)
     await message.answer('Type your guess:')
     """x1 = randint(0, 9)
     x10 = randint(0, 9)
@@ -28,8 +53,6 @@ async def start_game(message: types.Message, state: FSMContext):
     if x1000 == x1 or x10 == x100 or x10 == x10:
         x1000 = randint(1, 9)"""
     global number
-    import random
-
     digits = list(range(10))
     random.shuffle(digits)
     global number
@@ -39,12 +62,31 @@ async def start_game(message: types.Message, state: FSMContext):
     #await message.answer(number)
     await state.set_state(2)
 
+@dp.message_handler(commands=['restart'],state='restart')
+async def start_game(message: types.Message, state: FSMContext):
+    """x1 = randint(0, 9)
+    x10 = randint(0, 9)
+    x100 = randint(0, 9)
+    x1000 = randint(1, 9)
+    if x10 == x1 or x10 == x100 or x10 == x1000:
+        x10 = randint(0, 9)
+    if x100 == x1 or x100 == x10 or x100 == x1000:
+        x100 = randint(0, 9)
+    if x1000 == x1 or x10 == x100 or x10 == x10:
+        x1000 = randint(1, 9)"""
+    await message.answer('Type your guess:')
+    global number
+    digits = list(range(10))
+    random.shuffle(digits)
+    global number
+    number = int(''.join(map(str, digits[:4])))
+    #number = x1 + x10 * 10 + x100 * 100 + x1000 * 1000
+
+    #await message.answer(number)
+    await state.set_state(2)
 
 @dp.message_handler(state='2')
 async def process_guess(message: types.Message, state: FSMContext):
-
-    attempts = 1
-    score = 0
 
     """await state.update_data(number=number)
     data = await state.get_data()
@@ -85,13 +127,22 @@ async def process_guess(message: types.Message, state: FSMContext):
             if mills == number // 1000:
                 bulls += 1
 
-            attempts += 1
             await message.answer(f'Bulls: {bulls}, Cows: {cows}')
 
         else:
-            score += 1
-            await message.answer(f'You guessed! Your attempts: {attempts}, your score:{score}')
+            await message.answer('Congratulations! You guessed!')
+            await message.answer('/restart to start again.')
+            await state.set_state('restart')
     else:
-        await message.answer('Ooops... Try again!')
+
+        global ecount
+        if ecount == 4:
+            ecount-=4
+            await state.reset_state()
+            await message.answer('I told ya not to try... Didn`t I? Now... look what have you done!!!')
+        else:
+            await message.answer('Ooops... This doesn"t look like number. Try again!')
+            ecount+=1
+            await state.set_state('2')
 
 executor.start_polling(dp, skip_updates=True)
