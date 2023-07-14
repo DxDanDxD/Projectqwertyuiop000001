@@ -88,10 +88,6 @@ async def start_game(message: types.Message, state: FSMContext):
 @dp.message_handler(state='2')
 async def process_guess(message: types.Message, state: FSMContext):
 
-    """await state.update_data(number=number)
-    data = await state.get_data()
-    number = data['number']"""
-
     if message.text.isdigit():
         guess = int(message.text)
 

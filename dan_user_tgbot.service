@@ -1,0 +1,14 @@
+
+[Unit]
+Description=Telegram Bot
+After=network.target
+
+[Service]
+User=dan_user
+Group=dan_user
+WorkingDirectory=/home/dan_user/Projectqwertyuiop000001/
+Environment="PYTHONPATH=/home/dan_user/Projectqwertyuiop000001/"
+ExecStart=/home/dan_user/Projectqwertyuiop000001/.venv/bin/python /home/testdan_user/Projectqwertyuiop000001/cnbbot.py
+
+[Install]
+WantedBy=multi-user.target
